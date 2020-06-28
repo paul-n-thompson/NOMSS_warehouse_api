@@ -1,1 +1,53 @@
-<H1>Home Page</H1>
+<H1>Confirm Orders</H1>
+<p>Please select the orders to be placed.</p>
+
+<form name="place_order_form">
+    <input type="Checkbox" name="orders" value ="1122">1122
+    <input type="Checkbox" name="orders" value ="1123">1123
+    <br>
+    <input type="Checkbox" name="orders" value ="1124">1124
+    <input type="Checkbox" name="orders" value ="1125">1125
+    <br>
+    <button type="button" onclick="placeOrders();">Place Orders</button>
+</form>
+
+
+<script type="text/javascript">
+
+    function placeOrders() {
+        var placedOrders = []
+        var orders = document.getElementsByName("orders");
+        for(var i = 0; i < orders.length; i++) {
+            if(orders[i].checked == true) {
+                placedOrders.push(orders[i].value);
+            }
+        }
+
+        console.log("Placing Orders");
+        console.log(placedOrders);
+
+        url = "{{ url_for('placeOrders')}}";
+        
+        postData(url, placedOrders, "POST")
+            .then(data => {
+                //Receive unfulfilled orders
+                console.log(data)
+            })
+    }
+
+    function postData(url = '', data = {}, r_method ='POST') {
+        return fetch(url, {
+            method: r_method,
+            mode:"cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            redirect: "follow",
+            referrer: "no-referrer",
+            body: JSON.stringify(data),
+        })
+        .then(response => response.json());
+    }
+</script>

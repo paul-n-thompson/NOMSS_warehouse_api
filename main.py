@@ -22,7 +22,12 @@ def getProduct(productId, productList):
 
 #This would create a loop that would call the appropriate APIs to reorder stock
 def reorderStock(stockItems):
-    
+    print("Reordering Stock: ")
+    for stock in stockItems:
+        print("Product Id: " + str(stock['productId']))
+        print("Current Stock: " + str(stock['quantityOnHand']))
+        print("Items: " + str(stock['reorderAmount']))
+        print("------------------------")
     return
 
 #TODO: If I cannot get the array from the body of the post request, mock a simple webpage and have the order array fed in
@@ -32,7 +37,9 @@ def home():
 
 #TODO: Change this to get the array from a body in the post request.
 @app.route("/api/v1/warehouse/fulfilment", methods=['POST'])
-def placeOrders(ordersPlaced): 
+def placeOrders(): 
+    ordersPlaced = request.json
+    #ordersPlaced = json.loads(ordersJson).read()
     orderList = getData()['orders']
     productList = getData()['products']
     pendingOrders = []
@@ -42,7 +49,7 @@ def placeOrders(ordersPlaced):
     
     #Finds the JSON data associated with orderIds from array input
     for order in orderList:
-        if order['orderId'] in ordersPlaced:
+        if str(order['orderId']) in ordersPlaced:
             pendingOrders.append(order)
 
     #Loops through all requested orders and determines if they can be filled
@@ -61,21 +68,12 @@ def placeOrders(ordersPlaced):
         #if the order was not flagged as unfulfillable then it is filled
         #if stock is taken below threshhold it is noted 
         if productsInStock:
-            print("Fulfilling order:" , order["orderId"])
             for desiredItem in order['items']:
                 stockItem = getProduct(desiredItem['productId'], productList)
-                print("Desired Item:" , desiredItem["productId"])
-                print("Desired Qty:" , desiredItem['quantity'])
-                print("Existing Qty:" , stockItem['quantityOnHand'])
-
                 stockItem['quantityOnHand'] -= desiredItem['quantity']
-                print("Qty after order:" , stockItem['quantityOnHand'])
-                print("Qty threshhold:", stockItem['reorderThreshold'])
                 if (stockItem['quantityOnHand'] < stockItem['reorderThreshold']):
                     if stockItem not in stockToReorder:
                         stockToReorder.append(stockItem)
-
-            print("------------------------")
             order['status'] = 'Fulfilled'
             fulfilledOrders.append(order)
     
@@ -83,25 +81,28 @@ def placeOrders(ordersPlaced):
     #This is done after to prevent duplicate reorders
     reorderStock(stockToReorder)
 
-
-    print('Fulfilled:')
-    print(fulfilledOrders)
+    print("Orders Placed:")
+    print(ordersPlaced)
     print("------------------------")
-    print('Unfulfilled:')
-    print(unfulfillableOrders)
+    print('Orders Fulfilled:') 
+    for order in fulfilledOrders:
+        print(order['orderId'])
     print("------------------------")
-    print("Stock to Reorder:")
-    print(stockToReorder)
+    print('Orders Unfulfilled:')
+    for order in unfulfillableOrders:
+        print(order['orderId'])
+    print("------------------------")
+    
 
 
             
     #print (orderList)
     #print(ordersPlaced)
-    return
+    return jsonify(unfulfillableOrders)
 
 
-orders = [1122, 1123, 1124, 1125] 
-placeOrders(orders)
+#orders = [1122, 1123, 1124, 1125] 
+#placeOrders(orders)
 
 if __name__ == "__main__":
     app.run(debug=True)
