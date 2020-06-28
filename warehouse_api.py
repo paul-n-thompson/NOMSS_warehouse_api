@@ -64,10 +64,10 @@ def placeOrders():
     print('Orders Unfulfilled:')
     for order in unfulfillableOrders:
         print(order['orderId'])
-        if "Unfillable" in response:
-            response["Unfillable"].append(order['orderId'])
+        if "unfillable" in response:
+            response["unfillable"].append(order['orderId'])
         else:
-            response["Unfillable"] = [order['orderId']]
+            response["unfillable"] = [order['orderId']]
     print("------------------------")
     
  

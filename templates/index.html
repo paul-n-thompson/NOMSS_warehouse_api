@@ -41,9 +41,9 @@ This was constructed to demonstrate the api receiving external data
             .then(data => {
                 //Receives unfulfilled orders as response, alerts user of order
                 console.log(data)
-                if (typeof data.Unfillable !== 'undefined') {
-                    if (data.Unfillable.length > 0) {
-                        alert("Error fulfilling orders: " + data.Unfillable)
+                if (typeof data.unfillable !== 'undefined') {
+                    if (data.unfillable.length > 0) {
+                        alert("Error fulfilling orders: " + data.unfillable)
                     } 
                 } else {
                         alert("All orders fulfilled")
