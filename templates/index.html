@@ -1,3 +1,10 @@
+<!--
+Coded By: Paul N Thompson
+Coded for the NOMSS Tech Challenge
+Very simple front end to send request body and receive response from warehouse api
+This was constructed to demonstrate the api receiving external data
+-->
+
 <H1>Confirm Orders</H1>
 <p>Please select the orders to be placed.</p>
 
@@ -11,9 +18,10 @@
     <button type="button" onclick="placeOrders();">Place Orders</button>
 </form>
 
+<script type="text/javascript" src="../scripts/functions.js"></script>
 
 <script type="text/javascript">
-
+    // Looks at all Checkbox elements with the name 'order' adds ints to dictionary
     function placeOrders() {
         var placedOrders = {}
         var orders = document.getElementsByName("orders");
@@ -27,15 +35,23 @@
         console.log("Placing Orders");
         console.log(placedOrders);
 
-        url = "{{ url_for('placeOrders')}}";
+        url = "{{ url_for('warehouse_blueprint.placeOrders')}}";
         
         postData(url, placedOrders, "POST")
             .then(data => {
-                //Receive unfulfilled orders
+                //Receives unfulfilled orders as response, alerts user of order
                 console.log(data)
+                if (typeof data.Unfillable !== 'undefined') {
+                    if (data.Unfillable.length > 0) {
+                        alert("Error fulfilling orders: " + data.Unfillable)
+                    } 
+                } else {
+                        alert("All orders fulfilled")
+                }
             })
     }
 
+    // Function to help create fetch calls, reduces duplicate code
     function postData(url = '', data = {}, r_method ='POST') {
         return fetch(url, {
             method: r_method,
