@@ -15,11 +15,12 @@
 <script type="text/javascript">
 
     function placeOrders() {
-        var placedOrders = []
+        var placedOrders = {}
         var orders = document.getElementsByName("orders");
         for(var i = 0; i < orders.length; i++) {
             if(orders[i].checked == true) {
-                placedOrders.push(orders[i].value);
+                if (!placedOrders["orderIds"]) placedOrders["orderIds"] = []
+                placedOrders["orderIds"].push(parseInt(orders[i].value));
             }
         }
 
